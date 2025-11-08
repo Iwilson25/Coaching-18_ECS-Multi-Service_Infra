@@ -1,47 +1,46 @@
-name: CD - Infra
+name: CI - Infra
 
 on:
-  push:
-    branches: [main]
+  pull_request:
     paths:
       - "infra/**"
-  workflow_dispatch: # allows manual trigger
-
-permissions:
-  id-token: write
-  contents: read
-
-env:
-  AWS_REGION: us-east-1
 
 jobs:
-  terraform-apply:
+  terraform-ci:
+    name: Terraform Validation
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.5
 
+      # Check formatting
+      - name: Terraform Format Check
+        working-directory: infra
+        run: terraform fmt -check
+
+      # Initialize (without backend)
       - name: Terraform Init
         working-directory: infra
-        run: terraform init
+        run: terraform init -backend=false
 
-      - name: Terraform Plan
+      # Validate configuration syntax
+      - name: Terraform Validate
         working-directory: infra
-        run: terraform plan -out=tfplan
+        run: terraform validate
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
+      # Optional: Lint with tflint
+      - name: Setup tflint
+        uses: terraform-linters/setup-tflint@v4
+      - name: Run tflint
         working-directory: infra
-        run: terraform apply -auto-approve tfplan
+        run: |
+          tflint --init
+          tflint
