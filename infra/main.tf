@@ -2,8 +2,6 @@
 # Data Sources
 ########################################
 
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
 data "aws_vpc" "default" { id = "vpc-090223335abb8d785" }
 data "aws_subnets" "public" {
   filter {
