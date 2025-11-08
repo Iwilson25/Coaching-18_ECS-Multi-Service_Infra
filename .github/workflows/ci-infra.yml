@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "infra/**"
+  workflow_dispatch:
 
 jobs:
   terraform-ci:
