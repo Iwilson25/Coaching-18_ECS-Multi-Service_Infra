@@ -266,10 +266,10 @@ resource "aws_ecs_task_definition" "svc1" {
   task_role_arn            = aws_iam_role.task_role_svc1.arn
 
   container_definitions = jsonencode([{
-    name  = "svc1"
-    image = "${aws_ecr_repository.svc1.repository_url}:latest"
+    name         = "svc1"
+    image        = "${aws_ecr_repository.svc1.repository_url}:latest"
     portMappings = [{ containerPort = 5000 }]
-    environment = [{ name = "BUCKET_NAME", value = aws_s3_bucket.uploads.bucket }]
+    environment  = [{ name = "BUCKET_NAME", value = aws_s3_bucket.uploads.bucket }]
     logConfiguration = {
       logDriver = "awslogs"
       options = {
@@ -291,10 +291,10 @@ resource "aws_ecs_task_definition" "svc2" {
   task_role_arn            = aws_iam_role.task_role_svc2.arn
 
   container_definitions = jsonencode([{
-    name  = "svc2"
-    image = "${aws_ecr_repository.svc2.repository_url}:latest"
+    name         = "svc2"
+    image        = "${aws_ecr_repository.svc2.repository_url}:latest"
     portMappings = [{ containerPort = 5000 }]
-    environment = [{ name = "QUEUE_URL", value = aws_sqs_queue.messages.url }]
+    environment  = [{ name = "QUEUE_URL", value = aws_sqs_queue.messages.url }]
     logConfiguration = {
       logDriver = "awslogs"
       options = {
@@ -318,8 +318,8 @@ resource "aws_ecs_service" "svc1" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = data.aws_subnets.public.ids
-    security_groups = [aws_security_group.tasks.id]
+    subnets          = data.aws_subnets.public.ids
+    security_groups  = [aws_security_group.tasks.id]
     assign_public_ip = true
   }
 
@@ -340,8 +340,8 @@ resource "aws_ecs_service" "svc2" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = data.aws_subnets.public.ids
-    security_groups = [aws_security_group.tasks.id]
+    subnets          = data.aws_subnets.public.ids
+    security_groups  = [aws_security_group.tasks.id]
     assign_public_ip = true
   }
 
